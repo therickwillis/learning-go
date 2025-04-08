@@ -1,6 +1,11 @@
 {{define "note"}}
-<div class="note" style="background-color: {{.Color}}">
+<div class="note" id="note-{{.ID}}" style="background-color: {{.Color}}">
     <strong>#{{.ID}}</strong><br>
     {{.Content}}
+    <button
+        hx-delete="/delete/{{.ID}}"
+        hx-target="#note-{{.ID}}"
+        hx-swap="outerHTML"
+        style="margin-top: 0.5rem">Delete</button>
 </div>
 {{end}}

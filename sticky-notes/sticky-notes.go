@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 )
 
 type Note struct {
@@ -19,6 +20,7 @@ var nextID = 1
 func main() {
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/add", handleAdd)
+	http.HandleFunc("/delete/", handleDelete)
 	fmt.Println("Started serving on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
@@ -65,4 +67,28 @@ func handleAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func handleDelete(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[DELETE /delete] Received delete request")
+
+	idStr := r.URL.Path[len("/delete/"):]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		fmt.Println("Invalid ID")
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("[DELETE /delete]", id)
+
+	var updated []Note
+	for _, n := range notes {
+		if n.ID != id {
+			updated = append(updated, n)
+		}
+	}
+	notes = updated
+
+	w.WriteHeader(http.StatusOK)
 }
