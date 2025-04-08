@@ -24,11 +24,17 @@ func main() {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[GET /] Rendering Index")
 	tmpl := template.Must(template.ParseFiles("templates/index.html", "templates/note.html"))
-	tmpl.Execute(w, notes)
+	err := tmpl.Execute(w, notes)
+	if err != nil {
+		fmt.Println("index template execution error:", err)
+	}
 }
 
 func handleAdd(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[POST /add] Received form submission")
+
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -36,6 +42,8 @@ func handleAdd(w http.ResponseWriter, r *http.Request) {
 
 	content := r.FormValue("content")
 	color := r.FormValue("color")
+
+	fmt.Println("Form Values", content, color)
 
 	note := Note{
 		ID:      nextID,
@@ -47,8 +55,12 @@ func handleAdd(w http.ResponseWriter, r *http.Request) {
 	notes = append(notes, note)
 
 	if r.Header.Get("HX-Request") == "true" {
+		fmt.Print("HX-Request Add")
 		tmpl := template.Must(template.ParseFiles("templates/note.html"))
-		tmpl.Execute(w, note)
+		err := tmpl.ExecuteTemplate(w, "note", note)
+		if err != nil {
+			fmt.Println("note template execution error:", err)
+		}
 		return
 	}
 
