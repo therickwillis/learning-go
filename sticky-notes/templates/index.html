@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sticky Notes</title>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+            padding: 2rem;
+        }
+        .note {
+            background-color: #fff59d;
+            padding: 1rem;
+            margin: 1rem 0;
+            width: 200px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sticky Notes</h1>
+
+    <form 
+        method="POST" 
+        action="/add" 
+        hx-post="/add" 
+        hx-target="#notes" 
+        hx-swap="beforeend"
+        style="margin-bottom: 2rem;"
+    >
+        <textarea name="content" rows="3" cols="30" placeholder="Write a note..." required></textarea><br>
+        <input type="color" name="color" value="#fff59d">
+        <button type="submit">Add Note</button>
+    </form>
+
+    <div id="notes">
+        {{range .}}
+            {{template "note" .}}
+        {{else}}
+            <p>No notes yet. Try adding one!</p>
+        {{end}}
+    </div>
+</body>
+</html>
