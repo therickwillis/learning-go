@@ -1,3 +1,9 @@
+{{define "noteList"}}
+    {{range .}}
+        {{template "note" .}}
+    {{end}}
+{{end}}
+
 {{define "note"}}
 <div class="note" id="note-{{.ID}}" style="background-color: {{.Color}}">
     <strong>#{{.ID}}</strong><br>

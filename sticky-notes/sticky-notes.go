@@ -13,15 +13,18 @@ type Note struct {
 	Color   string
 }
 
+var eventStreams = map[chan string]bool{}
 var notes = []Note{}
-
 var nextID = 1
 
 func main() {
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/add", handleAdd)
 	http.HandleFunc("/delete/", handleDelete)
-	fmt.Println("Started serving on port 8080")
+	http.HandleFunc("/poll", handlePoll)
+	http.HandleFunc("/events", handleEvents)
+
+	fmt.Println("Lisetning on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -55,6 +58,7 @@ func handleAdd(w http.ResponseWriter, r *http.Request) {
 	nextID++
 
 	notes = append(notes, note)
+	broadcastUpdate()
 
 	if r.Header.Get("HX-Request") == "true" {
 		fmt.Print("HX-Request Add")
@@ -90,5 +94,48 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	notes = updated
 
+	broadcastUpdate()
 	w.WriteHeader(http.StatusOK)
+}
+
+// curl -N http://localhost:8080/events
+func handleEvents(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[GET /events] Received SSE Request")
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	eventChan := make(chan string)
+	eventStreams[eventChan] = true
+	defer func() {
+		delete(eventStreams, eventChan)
+		close(eventChan)
+	}()
+
+	for msg := range eventChan {
+		fmt.Println("[SSE] sending event:", msg)
+		fmt.Fprintf(w, "event: update\n")
+		fmt.Fprintf(w, "data: ping\n\n")
+		flusher.Flush()
+	}
+}
+
+func handlePoll(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[GET /poll] Received Poll Request")
+	tmpl := template.Must(template.ParseFiles("templates/note.html"))
+	err := tmpl.ExecuteTemplate(w, "noteList", notes)
+	if err != nil {
+		fmt.Println("Poll template error:", err)
+	}
+}
+
+func broadcastUpdate() {
+	for ch := range eventStreams {
+		ch <- "ping"
+	}
 }
