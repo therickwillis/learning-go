@@ -5,6 +5,8 @@ This repo contains learning experiments in Go.
 
 ## Requirements
 
+1. `go` available in cmd
+
 For a good time:
 
 1. Install Air
@@ -17,8 +19,11 @@ For a good time:
 
 Each folder is an experiment.  No references between experiments.
 
+Remember to run commands from the root of the experiment folder.
+
 ## Some useful things I have learned
 
 ### go cli
 
-*  `go env` to print the Go environment information
+*  `go env` to print the Go environment information.
+* `go help <command>` to learn about a command
