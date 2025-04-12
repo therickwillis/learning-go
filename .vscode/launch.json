@@ -1,16 +1,29 @@
 {
     "version": "0.2.0",
-    "configurations": [
+    "configurations": [      
       {
-        "name": "Debug Sticky Notes",
+        "name": "Attach to Air (Delve)",
+        "type": "go",
+        "request": "attach",
+        "mode": "local",
+        "processId": "${command:pickProcess}",
+        "showLog": true
+      },
+      {
+        "name": "Debug Go Program",
         "type": "go",
         "request": "launch",
-        "mode": "auto",
-        "program": "${workspaceFolder}/sticky-notes",
-        "env": {},
-        "args": [],
-        "showLog": true
+        "mode": "debug",
+        "program": "${input:goProgramPath}"
+      }
+    ],
+    "inputs": [
+      {
+        "id": "goProgramPath",
+        "type": "promptString",
+        "description": "Enter the path to the folder containing main.go",
+        "default": "./click-trainer"
       }
     ]
-  }
+}
   

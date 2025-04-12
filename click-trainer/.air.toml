@@ -3,8 +3,8 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/main"
-  bin = "tmp/main"
+  cmd = "go build -o ./tmp/main.exe"
+  bin = "tmp/main.exe"
   include_ext = ["go", "tpl", "html"]
   exclude_dir = ["tmp", "vendor"]
   log = "air.log"

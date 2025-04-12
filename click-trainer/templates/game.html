@@ -1,9 +1,24 @@
 {{define "game"}}
-<div id="game-content">
-    {{template "gameContent" .}}
-</div>
-<div id="sse-conn"></div>
+<!DOCTYPE html>
+<html>
 
+<head>
+    <meta charset="UTF-8">
+    <title>Click Trainer - Target Game</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx-ext-sse@2.2.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+
+<body class=" bg-gray-200">
+    <div id="game-content">
+        {{template "gameContent" .}}
+    </div>
+    <div id="sse-conn"></div>
+</body>
+
+</html>
 {{end}}
 
 {{define "gameContent"}}
