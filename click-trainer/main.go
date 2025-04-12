@@ -68,6 +68,18 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	cookie, err := r.Cookie("player_id")
+	if err != nil {
+		return
+	}
+	fmt.Println("Found Session", cookie.Value)
+
+	playersMu.Lock()
+	if players[cookie.Value] != nil {
+		enterGame(w)
+	}
+	playersMu.Unlock()
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -82,17 +94,21 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Registering name:", name)
 
 	http.SetCookie(w, &http.Cookie{
-		Name:  "player_id",
-		Value: id,
-		Path:  "/",
+		Name:     "player_id",
+		Value:    id,
+		Path:     "/",
+		HttpOnly: true,
 	})
 
 	playersMu.Lock()
 	players[id] = &Player{Name: name}
 	playersMu.Unlock()
 
+	enterGame(w)
+}
+
+func enterGame(w http.ResponseWriter) {
 	gameData := getGameData()
-	fmt.Println(gameData)
 	if err := tmpl.ExecuteTemplate(w, "game", gameData); err != nil {
 		fmt.Println(err.Error())
 	}
@@ -117,6 +133,7 @@ func getGameData() GameData {
 	}
 	return GameData{
 		Players: playerList,
-		Target:  currentTarget,
+
+		Target: currentTarget,
 	}
 }

@@ -7,20 +7,29 @@
 {{end}}
 
 {{define "gameContent"}}
-<div class="grid grid-cols-4 gap-4 p-4 h-screen">
-    <div>
-        <div class="grid grid-cols-2 gap-4">
-            <div>Player</div>
-            <div>Score</div>
-            {{range .Players}}
-            <label class="text-sm font-bold">{{ .Name }}</label>
-            <div class="text-sm">{{ .Score}}</div>
-            {{end}}
-        </div>
+<div class="p-4 h-screen relative">
+    <div class="w-sm absolute top-4 right-4">
+        {{template "scoreboard" .Players}}
     </div>
-    <div class="col-span-2">
+    <div class="col-span-2 h-full flex flex-col justify-center items-center">
         <h2>The game will go here</h2>
     </div>
     <div></div>
 </div>
+{{end}}
+
+{{define "scoreboard"}}
+<div class="grid grid-cols-2 gap-3 bg-white rounded-lg border border-gray-300 p-4">
+    <div class="text-sm text-gray-600">Player</div>
+    <div class="text-sm text-gray-600">Score</div>
+    <hr class="col-span-2 border-bottom border-gray-600" />
+    {{range .}}
+    <label class="text-sm font-bold border-bottom">{{ .Name }}</label>
+    <div class="text-sm">{{ .Score}}</div>
+    {{end}}
+</div>
+{{end}}
+
+{{define "target"}}
+<div>i'm a target</div>
 {{end}}
