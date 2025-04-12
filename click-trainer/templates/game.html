@@ -1,0 +1,26 @@
+{{define "game"}}
+<div id="game-content">
+    {{template "gameContent" .}}
+</div>
+<div id="sse-conn"></div>
+
+{{end}}
+
+{{define "gameContent"}}
+<div class="grid grid-cols-4 gap-4 p-4 h-screen">
+    <div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>Player</div>
+            <div>Score</div>
+            {{range .Players}}
+            <label class="text-sm font-bold">{{ .Name }}</label>
+            <div class="text-sm">{{ .Score}}</div>
+            {{end}}
+        </div>
+    </div>
+    <div class="col-span-2">
+        <h2>The game will go here</h2>
+    </div>
+    <div></div>
+</div>
+{{end}}
