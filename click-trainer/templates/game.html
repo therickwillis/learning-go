@@ -11,7 +11,7 @@
     <link rel="icon" href="/static/favicon.ico">
 </head>
 
-<body class=" bg-gray-200">
+<body class="bg-gray-700">
     <div id="game-content">
         {{template "gameContent" .}}
     </div>
@@ -23,21 +23,26 @@
 
 {{define "gameContent"}}
 <div class="p-4 h-screen relative">
-    <div class="w-sm absolute top-4 right-4">
+    <div class="w-sm absolute top-4 right-4 z-1">
         {{template "scoreboard" .Players}}
-    </div>
-    <div class="col-span-2 h-full flex flex-col justify-center items-center">
-        <h2>The game will go here</h2>
-    </div>
-    <div></div>
+    </div>    
+    <div class="col-span-2 h-full flex flex-col justify-center items-center">        
+        <div id="game-area" class="relative bg-gray-200 border-4 border-gray-300" style="width:600px; height:400px;" >
+            {{range .Targets}}
+                {{template "target" .}}
+            {{end}}
+        </div>
+    </div>    
 </div>
 {{end}}
 
 {{define "scoreboard"}}
-<div class="grid grid-cols-2 gap-3 bg-white rounded-lg border border-gray-300 p-4">
+<div class="grid grid-cols-2 gap-3 bg-white rounded-lg border-4 border-gray-300 p-4">
     <div class="text-sm text-gray-600">Player</div>
     <div class="text-sm text-gray-600">Score</div>
+
     <hr class="col-span-2 border-bottom border-gray-600" />
+    
     {{range .}}
     <label class="text-sm font-bold border-bottom">{{ .Name }}</label>
     <div class="text-sm">{{ .Score}}</div>
@@ -46,5 +51,16 @@
 {{end}}
 
 {{define "target"}}
-<div>i'm a target</div>
+<div id="target"
+    hx-post="/target"
+    hx-swap="none"    
+    style="
+        position:absolute;
+        left: {{ .X }}px;
+        top: {{ .Y }}px;
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        cursor: pointer;">
+</div>
 {{end}}
