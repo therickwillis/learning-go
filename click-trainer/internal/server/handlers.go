@@ -3,8 +3,13 @@ package server
 import (
 	gamedata "clicktrainer/internal/game"
 	"clicktrainer/internal/players"
+	"clicktrainer/internal/targets"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -28,6 +33,13 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handlePoll(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[Handle:Poll] Request Received")
+	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get()); err != nil {
+		log.Println(err)
+	}
+}
+
 func handleTarget(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Target] Request Received")
 	cookie, err := r.Cookie("player_id")
@@ -35,16 +47,29 @@ func handleTarget(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not Registered", http.StatusBadRequest)
 		return
 	}
-	id := cookie.Value
+	parts := strings.Split(r.URL.Path, "/")
 
-	players.UpdateScore(id, 1)
+	// Target
+	strTargetId := parts[2]
+	targetId, err := strconv.Atoi(strTargetId)
+	if err != nil {
+		log.Println(err)
+	}
+	targets.Kill(targetId)
+	time.AfterFunc(500*time.Millisecond, func() {
+		targets.Add()
+		BroadcastGame()
+	})
 
-	// targetMu.Lock()
-	// currentTarget = Target{
-	// 	X: rand.Intn(gameWidth - targetSize),
-	// 	Y: rand.Intn(gameHeight - targetSize),
-	// }
-	// targetMu.Unlock()
+	// Player
+	strPoints := parts[3]
+	points, err := strconv.Atoi(strPoints)
+	if err != nil {
+		log.Println(err)
+	}
+	players.UpdateScore(cookie.Value, points)
+
+	BroadcastGame()
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -68,5 +93,6 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if err := players.Add(id, name); err != nil {
 		fmt.Println(err.Error())
 	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	BroadcastGame()
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

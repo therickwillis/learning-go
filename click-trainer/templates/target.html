@@ -1,0 +1,47 @@
+{{define "target"}}
+<svg 
+    width="150" 
+    height="150" 
+    viewBox="0 0 150 150" 
+    class="target"
+    style="
+        position:absolute;
+        left: {{ .X }}px;
+        top: {{ .Y }}px;
+        width: {{ .Size }}px;
+        height: {{ .Size }}px;"    
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Radial gradient for a cool outer glow effect -->
+      <radialGradient id="outerGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" style="stop-color:#ffffff; stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#ff0000; stop-opacity:1" />
+      </radialGradient>
+    </defs>
+    <!-- Outer circle with gradient fill -->
+    <circle
+        hx-trigger="mousedown"
+        hx-post="/target/{{.ID}}/1"
+        hx-swap="none"
+
+        cx="75" cy="75" r="70" fill="url(#outerGradient)"/>
+    <!-- Middle white circle -->
+    <circle 
+        hx-trigger="mousedown"
+        hx-post="/target/{{.ID}}/2"
+        hx-swap="none"            
+        cx="75" cy="75" r="50" fill="#ffffff"/>
+    <!-- Inner red circle -->
+    <circle 
+        hx-trigger="mousedown"
+        hx-post="/target/{{.ID}}/3"
+        hx-swap="none"    
+        cx="75" cy="75" r="30" fill="#ff0000"/>
+    <!-- Central bullseye -->
+    <circle
+        hx-trigger="mousedown"
+        hx-post="/target/{{.ID}}/4"
+        hx-swap="none"    
+        cx="75" cy="75" r="10" fill="#ffffff"/>  
+</svg>
+{{end}}

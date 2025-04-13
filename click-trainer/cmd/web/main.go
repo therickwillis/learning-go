@@ -7,7 +7,9 @@ import (
 )
 
 func main() {
-	targets.Add()
+	for i := 0; i < 3; i++ {
+		targets.Add()
+	}
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err.Error())

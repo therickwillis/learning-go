@@ -8,14 +8,22 @@
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <script src="https://unpkg.com/htmx-ext-sse@2.2.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="/static/styles.css">
     <link rel="icon" href="/static/favicon.ico">
 </head>
 
-<body class="bg-gray-700">
+<body hx-ext="sse" class="bg-gray-700">
     <div id="game-content">
         {{template "gameContent" .}}
     </div>
-    <div id="sse-conn"></div>
+    <div id="sse-conn"
+        sse-connect="/events"
+        sse-swap="none"
+        hx-trigger="sse:update"
+        hx-get="/poll"
+        hx-target="#game-content"
+        hx-swap="innerHTML"
+    ></div>
 </body>
 
 </html>
@@ -26,8 +34,8 @@
     <div class="w-sm absolute top-4 right-4 z-1">
         {{template "scoreboard" .Players}}
     </div>    
-    <div class="col-span-2 h-full flex flex-col justify-center items-center">        
-        <div id="game-area" class="relative bg-gray-200 border-4 border-gray-300" style="width:600px; height:400px;" >
+    <div class="col-span-2 h-full flex flex-col justify-center items-center">
+        <div id="game-area" class="relative bg-gray-200 border-4 border-gray-300" >
             {{range .Targets}}
                 {{template "target" .}}
             {{end}}
@@ -50,17 +58,7 @@
 </div>
 {{end}}
 
-{{define "target"}}
-<div id="target"
-    hx-post="/target"
-    hx-swap="none"    
-    style="
-        position:absolute;
-        left: {{ .X }}px;
-        top: {{ .Y }}px;
-        width: 50px;
-        height: 50px;
-        background-color: red;
-        cursor: pointer;">
-</div>
-{{end}}
+
+
+
+  

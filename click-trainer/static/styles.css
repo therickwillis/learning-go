@@ -1,0 +1,48 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+    
+  #game-area {
+    width: 600px;
+    height: 400px;
+    background-color: #f0f0f0;
+    border: 2px solid #333;
+  }
+  
+  
+  /* Animation for when the target is added */
+.target {
+    /* Run an enter animation on load */
+    animation: targetEnter 0.3s ease-out;
+  }
+  
+  @keyframes targetEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Class for triggering exit animation */
+  .fade-out {
+    animation: targetExit 0.3s ease-out forwards;
+  }
+  
+  @keyframes targetExit {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+  
