@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	gamedata "clicktrainer/internal/game"
 	"clicktrainer/internal/players"
 	"clicktrainer/internal/targets"
@@ -57,8 +58,14 @@ func handleTarget(w http.ResponseWriter, r *http.Request) {
 	}
 	targets.Kill(targetId)
 	time.AfterFunc(500*time.Millisecond, func() {
-		targets.Add()
-		BroadcastGame()
+		newTarget := targets.Add()
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "target", newTarget); err != nil {
+			log.Println(err)
+		}
+
+		fmt.Println("sending OOB for new Target")
+		BroadcastOOB("newTarget", buf.String())
 	})
 
 	// Player
@@ -67,9 +74,12 @@ func handleTarget(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	players.UpdateScore(cookie.Value, points)
+	playerId := cookie.Value
+	player := players.UpdateScore(playerId, points)
 
-	BroadcastGame()
+	targetOOB := fmt.Sprintf(`<div id="target_%d" hx-swap-oob="delete"></div>`, targetId)
+	playerOOB := fmt.Sprintf(`<div id="player_score_%s" hx-swap-oob="innerHTML">%d</div>`, player.ID, player.Score)
+	BroadcastOOB("swap", targetOOB+playerOOB)
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +103,14 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if err := players.Add(id, name); err != nil {
 		fmt.Println(err.Error())
 	}
-	BroadcastGame()
+
+	var buf bytes.Buffer
+	if err := tmpl.ExecuteTemplate(&buf, "scoreboard", players.GetList()); err != nil {
+		log.Println(err)
+	}
+	//playersOOB := fmt.Sprintf(`<div id="scoreboard" hx-oob-swap="outerHTML">%s</div>`, buf.String())
+	//BroadcastOOB("swap", playersOOB)
+	BroadcastOOB("scoreboard", buf.String())
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -1,13 +1,20 @@
 package server
 
 import (
+	"bufio"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 )
 
+type HxEventMessage struct {
+	Event string
+	Msg   string
+}
+
 var (
-	clients   = make(map[chan string]bool)
+	clients   = make(map[chan HxEventMessage]bool)
 	clientsMu sync.Mutex
 )
 
@@ -24,7 +31,7 @@ func handleEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	msgChan := make(chan string)
+	msgChan := make(chan HxEventMessage)
 	clientsMu.Lock()
 	clients[msgChan] = true
 	clientsMu.Unlock()
@@ -44,9 +51,15 @@ func handleEvents(w http.ResponseWriter, r *http.Request) {
 			delete(clients, msgChan)
 			return
 		case msg := <-msgChan:
-			fmt.Println("[SSE] sending event", msg)
-			fmt.Fprintf(w, "event: update\n")
-			fmt.Fprintf(w, "data: %v\n\n", msg)
+			scanner := bufio.NewScanner(strings.NewReader(msg.Msg))
+			fmt.Println("[SSE] sending event", msg.Event)
+
+			fmt.Fprintf(w, "event: %s\n", msg.Event)
+			for scanner.Scan() {
+				fmt.Fprintf(w, "data: %v\n", scanner.Text())
+			}
+
+			fmt.Fprint(w, "\n\n")
 			flusher.Flush()
 		}
 	}
@@ -54,7 +67,7 @@ func handleEvents(w http.ResponseWriter, r *http.Request) {
 }
 
 func BroadcastGame() {
-	message := "ping"
+	message := HxEventMessage{Event: "Update", Msg: "ping"}
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
 	for ch := range clients {
@@ -64,5 +77,16 @@ func BroadcastGame() {
 			// skip clients with full data channels
 		}
 	}
+}
 
+func BroadcastOOB(event string, message string) {
+	clientsMu.Lock()
+	defer clientsMu.Unlock()
+	for ch := range clients {
+		select {
+		case ch <- HxEventMessage{Event: event, Msg: message}:
+		default:
+			// skip clients with full data channels
+		}
+	}
 }

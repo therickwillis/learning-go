@@ -24,12 +24,14 @@ func GetList() []*Player {
 	return playerList
 }
 
-func UpdateScore(id string, points int) {
+func UpdateScore(id string, points int) *Player {
 	playersMu.Lock()
+	defer playersMu.Unlock()
 	if p, e := players[id]; e {
 		p.Score += points
+		return p
 	}
-	playersMu.Unlock()
+	return nil
 }
 
 func ValidateSession(sessionId string) bool {

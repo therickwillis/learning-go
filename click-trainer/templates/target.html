@@ -1,7 +1,6 @@
 {{define "target"}}
-<svg 
-    width="150" 
-    height="150" 
+<div id="target_{{ .ID }}">
+<svg     
     viewBox="0 0 150 150" 
     class="target"
     style="
@@ -23,7 +22,6 @@
         hx-trigger="mousedown"
         hx-post="/target/{{.ID}}/1"
         hx-swap="none"
-
         cx="75" cy="75" r="70" fill="url(#outerGradient)"/>
     <!-- Middle white circle -->
     <circle 
@@ -44,4 +42,5 @@
         hx-swap="none"    
         cx="75" cy="75" r="10" fill="#ffffff"/>  
 </svg>
+</div>
 {{end}}

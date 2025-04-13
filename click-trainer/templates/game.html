@@ -12,13 +12,12 @@
     <link rel="icon" href="/static/favicon.ico">
 </head>
 
-<body hx-ext="sse" class="bg-gray-700">
+<body hx-ext="sse" sse-connect="/events" class="bg-gray-700">
     <div id="game-content">
         {{template "gameContent" .}}
     </div>
-    <div id="sse-conn"
-        sse-connect="/events"
-        sse-swap="none"
+    <div sse-swap="swap" hx-swap="true"></div>
+    <div id="game-content-conn"                
         hx-trigger="sse:update"
         hx-get="/poll"
         hx-target="#game-content"
@@ -36,16 +35,20 @@
     </div>    
     <div class="col-span-2 h-full flex flex-col justify-center items-center">
         <div id="game-area" class="relative bg-gray-200 border-4 border-gray-300" >
+            <div id="targets">
             {{range .Targets}}
                 {{template "target" .}}
             {{end}}
+            <div sse-swap="newTarget" hx-swap="beforebegin"></div>            
+            </div>
         </div>
+        
     </div>    
 </div>
 {{end}}
 
 {{define "scoreboard"}}
-<div class="grid grid-cols-2 gap-3 bg-white rounded-lg border-4 border-gray-300 p-4">
+<div id="scoreboard" sse-swap="scoreboard" hx-swap="outerHTML" class="grid grid-cols-2 gap-3 bg-white rounded-lg border-4 border-gray-300 p-4">
     <div class="text-sm text-gray-600">Player</div>
     <div class="text-sm text-gray-600">Score</div>
 
@@ -53,8 +56,8 @@
     
     {{range .}}
     <label class="text-sm font-bold border-bottom">{{ .Name }}</label>
-    <div class="text-sm">{{ .Score}}</div>
-    {{end}}
+    <div id="player_score_{{ .ID }}" class="text-sm">{{ .Score}}</div>
+    {{end}}    
 </div>
 {{end}}
 

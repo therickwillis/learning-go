@@ -18,19 +18,20 @@ const (
 	maxTargetSize = 100
 )
 
-func Add() int {
+func Add() *Target {
 	targetsMu.Lock()
 	id := nextID
 	nextID++
 	targetSize := rand.Intn(maxTargetSize-minTargetSize) + minTargetSize
-	targets[id] = &Target{
+	target := &Target{
 		ID:   id,
 		X:    rand.Intn(gameWidth - targetSize),
 		Y:    rand.Intn(gameHeight - targetSize),
 		Size: targetSize,
 	}
+	targets[id] = target
 	targetsMu.Unlock()
-	return id
+	return target
 }
 
 func Kill(id int) {
