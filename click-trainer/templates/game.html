@@ -30,10 +30,10 @@
 
 {{define "gameContent"}}
 <div class="p-4 h-screen relative">
-    <div class="w-sm absolute top-4 right-4 z-1">
-        {{template "scoreboard" .Players}}
-    </div>    
-    <div class="col-span-2 h-full flex flex-col justify-center items-center">
+    <div class="h-full flex flex-col justify-center items-center md:scale-130 lg:scale-160 xl:scale-180 2xl:scale-200 3xl:scale-230 4xl:scale-260">
+        <div class="flex flex-row">
+            {{template "scoreboard" .Players}}
+        </div>    
         <div id="game-area" class="relative" >
             <div id="targets">
             {{range .Targets}}
@@ -48,15 +48,12 @@
 {{end}}
 
 {{define "scoreboard"}}
-<div id="scoreboard" sse-swap="scoreboard" hx-swap="outerHTML" class="grid grid-cols-2 gap-3 bg-white rounded-lg border-4 border-gray-300 p-4">
-    <div class="text-sm text-gray-600">Player</div>
-    <div class="text-sm text-gray-600">Score</div>
-
-    <hr class="col-span-2 border-bottom border-gray-600" />
-    
+<div id="scoreboard" sse-swap="scoreboard" hx-swap="outerHTML" class="flex flex-row flex-wrap gap-1 p-1 text-xs">        
     {{range .}}
-    <label style="color:{{.Color}}" class="text-sm font-bold border-bottom">{{ .Name }}</label>
-    <div id="player_score_{{ .ID }}" class="text-sm">{{ .Score}}</div>
+    <div id="player_{{.ID}}" class="bg-white flex flex-row p-1 rounded-lg">
+        <label style="color:{{.Color}}" class="mr-2">{{ .Name }}</label>
+        <div id="player_score_{{ .ID }}">{{ .Score}}</div>
+    </div>
     {{end}}    
 </div>
 {{end}}
