@@ -1,6 +1,7 @@
 package targets
 
 import (
+	utility "clicktrainer/internal"
 	"math/rand"
 	"sync"
 )
@@ -24,10 +25,11 @@ func Add() *Target {
 	nextID++
 	targetSize := rand.Intn(maxTargetSize-minTargetSize) + minTargetSize
 	target := &Target{
-		ID:   id,
-		X:    rand.Intn(gameWidth - targetSize),
-		Y:    rand.Intn(gameHeight - targetSize),
-		Size: targetSize,
+		ID:    id,
+		X:     rand.Intn(gameWidth - targetSize),
+		Y:     rand.Intn(gameHeight - targetSize),
+		Color: utility.RandomColorHex(),
+		Size:  targetSize,
 	}
 	targets[id] = target
 	targetsMu.Unlock()

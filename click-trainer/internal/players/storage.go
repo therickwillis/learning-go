@@ -1,6 +1,9 @@
 package players
 
-import "sync"
+import (
+	utility "clicktrainer/internal"
+	"sync"
+)
 
 var (
 	players   = make(map[string]*Player)
@@ -9,7 +12,7 @@ var (
 
 func Add(id string, name string) error {
 	playersMu.Lock()
-	players[id] = &Player{ID: id, Name: name}
+	players[id] = &Player{ID: id, Name: name, Color: utility.RandomColorHex()}
 	playersMu.Unlock()
 	return nil
 }

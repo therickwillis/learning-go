@@ -6,9 +6,10 @@ html, body {
   }
     
   #game-area {
+    position:relative;
     width: 600px;
     height: 400px;
-    background-color: #f0f0f0;
+    background-color: #e6edf4;
     border: 2px solid #333;
   }
   
