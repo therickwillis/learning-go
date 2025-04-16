@@ -1,17 +1,16 @@
-package gamedata
+package sessions
 
 import (
 	"clicktrainer/internal/players"
 	"clicktrainer/internal/targets"
 )
 
-type GameData struct {
-	Players []*players.Player
-	Targets []*targets.Target
-}
+var (
+	sessions = make(map[string]*Session)
+)
 
-func Get() GameData {
-	return GameData{
+func Get() Session {
+	return Session{
 		Players: players.GetList(),
 		Targets: targets.GetList(),
 	}

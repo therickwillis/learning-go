@@ -39,7 +39,7 @@ func UpdateScore(id string, points int) *Player {
 
 func ValidateSession(sessionId string) bool {
 	playersMu.Lock()
-	defer playersMu.Unlock()
 	_, exists := players[sessionId]
+	playersMu.Unlock()
 	return exists
 }

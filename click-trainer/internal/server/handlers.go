@@ -2,8 +2,8 @@ package server
 
 import (
 	"bytes"
-	gamedata "clicktrainer/internal/game"
 	"clicktrainer/internal/players"
+	gamedata "clicktrainer/internal/sessions"
 	"clicktrainer/internal/targets"
 	"fmt"
 	"log"
