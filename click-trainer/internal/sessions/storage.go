@@ -1,7 +1,7 @@
 package sessions
 
 import (
-	"fmt"
+	utility "clicktrainer/internal"
 	"math/rand"
 	"sync"
 
@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	sessions      = make(map[string]*Session)
 	gameHeight    = 400
 	gameWidth     = 600
 	minTargetSize = 50
@@ -60,11 +59,15 @@ func (s *Session) AddTarget() {
 			ID:    id,
 			X:     rand.Intn(gameWidth - targetSize),
 			Y:     rand.Intn(gameHeight - targetSize),
-			Color: RandomColorHex(),
+			Color: utility.RandomColorHex(),
 			Size:  targetSize,
 		}
 	}
 
+}
+
+func (s *Session) Events() <-chan SessionEvent {
+	return s.events
 }
 
 func (s *Session) broadcast(evt, data string) {
@@ -72,11 +75,4 @@ func (s *Session) broadcast(evt, data string) {
 	case s.events <- SessionEvent{Event: evt, Data: data}:
 	default:
 	}
-}
-
-func RandomColorHex() string {
-	r := uint8(rand.Intn(248) + 4)
-	g := uint8(rand.Intn(248) + 4)
-	b := uint8(rand.Intn(248) + 4)
-	return fmt.Sprintf("#%02x%02x%02x", r, g, b)
 }
