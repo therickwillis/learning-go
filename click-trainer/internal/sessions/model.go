@@ -18,10 +18,19 @@ type Target struct {
 	Dead  bool
 }
 
+type Phase int
+
+const (
+	Lobby Phase = iota
+	Game
+	End
+)
+
 type Session struct {
 	ID      string
 	Players map[string]*Player
 	Targets map[string]*Target
+	phase   Phase
 	events  chan SessionEvent
 	mu      sync.RWMutex
 }

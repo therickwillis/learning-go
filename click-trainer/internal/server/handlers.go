@@ -3,43 +3,61 @@ package server
 import (
 	"bytes"
 	"clicktrainer/internal/players"
-	gamedata "clicktrainer/internal/sessions"
 	"clicktrainer/internal/targets"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+var pages = map[string]*template.Template{}
+
+func init() {
+	baseTmpl := template.Must(template.ParseFiles("templates/base.html"))
+	for _, child := range []string{"register", "join", "lobby", "game", "recap"} {
+		t, _ := baseTmpl.Clone()
+		t.ParseFiles(fmt.Sprintf("templates/%s.html", child))
+		pages[child] = t
+	}
+}
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Index] Request Received")
 
 	cookie, err := r.Cookie("player_id")
 	if err == nil && players.ValidateSession(cookie.Value) {
-		gameData := gamedata.Get()
-		if err := tmpl.ExecuteTemplate(w, "game", gameData); err != nil {
+		// gameData := gamedata.Get()
+		if err := pages["join"].ExecuteTemplate(w, "base", nil); err != nil {
 			fmt.Println(err.Error())
 			http.Error(w, "Error rendering game view", http.StatusInternalServerError)
 		}
 		return
 	}
 
-	if err := tmpl.ExecuteTemplate(w, "join", nil); err != nil {
+	if err := pages["register"].ExecuteTemplate(w, "base", nil); err != nil {
 		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func handlePoll(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("[Handle:Poll] Request Received")
-	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get()); err != nil {
-		log.Println(err)
+func handleGame(w http.ResponseWriter, r *http.Request) {
+	if err := tmpl.ExecuteTemplate(w, "game", nil); err != nil {
+		fmt.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+// func handlePoll(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Println("[Handle:Poll] Request Received")
+// 	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get()); err != nil {
+// 		log.Println(err)
+// 	}
+// }
 
 func handleTarget(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Target] Request Received")

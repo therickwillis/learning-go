@@ -21,6 +21,7 @@ func NewSession(id string) *Session {
 		Players: make(map[string]*Player),
 		Targets: make(map[string]*Target),
 		events:  make(chan SessionEvent),
+		phase:   Lobby,
 		mu:      sync.RWMutex{},
 	}
 	return session
