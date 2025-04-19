@@ -37,9 +37,9 @@ func UpdateScore(id string, points int) *Player {
 	return nil
 }
 
-func ValidateSession(sessionId string) bool {
+func ValidateSession(sessionId string) (bool, *Player) {
 	playersMu.Lock()
-	_, exists := players[sessionId]
+	player, exists := players[sessionId]
 	playersMu.Unlock()
-	return exists
+	return exists, player
 }

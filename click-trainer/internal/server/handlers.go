@@ -29,14 +29,17 @@ func init() {
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Index] Request Received")
 
-	cookie, err := r.Cookie("player_id")
-	if err == nil && players.ValidateSession(cookie.Value) {
-		// gameData := gamedata.Get()
-		if err := pages["join"].ExecuteTemplate(w, "base", nil); err != nil {
-			fmt.Println(err.Error())
-			http.Error(w, "Error rendering game view", http.StatusInternalServerError)
+	idCookie, _ := r.Cookie("player_id")
+	nameCookie, _ := r.Cookie("player_name")
+
+	if err := idCookie.Valid(); err == nil {
+		if err := nameCookie.Valid(); err == nil {
+			if err := pages["join"].ExecuteTemplate(w, "base", nameCookie.Value); err != nil {
+				fmt.Println(err.Error())
+				http.Error(w, "Error rendering game view", http.StatusInternalServerError)
+			}
+			return
 		}
-		return
 	}
 
 	if err := pages["register"].ExecuteTemplate(w, "base", nil); err != nil {
@@ -114,6 +117,12 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "player_id",
 		Value:    id,
+		Path:     "/",
+		HttpOnly: true,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "player_name",
+		Value:    name,
 		Path:     "/",
 		HttpOnly: true,
 	})
