@@ -18,14 +18,29 @@ import (
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Index] Request Received")
 
-	cookie, err := r.Cookie("player_id")
-	if err == nil && players.ValidateSession(cookie.Value) {
+	idCookie, err := r.Cookie("player_id")
+	if err == nil {
+		nameCookie, err := r.Cookie("player_name")
+		if err != nil {
+			http.SetCookie(w, &http.Cookie{
+				Name:   "player_id",
+				MaxAge: -1,
+			})
+
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		if !players.ValidateSession(idCookie.Value) {
+			players.Add(idCookie.Value, nameCookie.Value)
+		}
+
 		gameData := gamedata.Get()
+
 		if err := tmpl.ExecuteTemplate(w, "game", gameData); err != nil {
 			fmt.Println(err.Error())
 			http.Error(w, "Error rendering game view", http.StatusInternalServerError)
 		}
-		return
 	}
 
 	if err := tmpl.ExecuteTemplate(w, "join", nil); err != nil {
@@ -43,7 +58,7 @@ func handlePoll(w http.ResponseWriter, r *http.Request) {
 
 func handleTarget(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Target] Request Received")
-	cookie, err := r.Cookie("player_id")
+	idCookie, err := r.Cookie("player_id")
 	if err != nil {
 		http.Error(w, "Not Registered", http.StatusBadRequest)
 		return
@@ -74,7 +89,7 @@ func handleTarget(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	playerId := cookie.Value
+	playerId := idCookie.Value
 	player := players.UpdateScore(playerId, points)
 
 	targetOOB := fmt.Sprintf(`<div id="target_%d" hx-swap-oob="delete"></div>`, targetId)
@@ -99,6 +114,12 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "player_name",
+		Value:    name,
+		Path:     "/",
+		HttpOnly: true,
+	})
 
 	if err := players.Add(id, name); err != nil {
 		fmt.Println(err.Error())
@@ -108,8 +129,6 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	if err := tmpl.ExecuteTemplate(&buf, "scoreboard", players.GetList()); err != nil {
 		log.Println(err)
 	}
-	//playersOOB := fmt.Sprintf(`<div id="scoreboard" hx-oob-swap="outerHTML">%s</div>`, buf.String())
-	//BroadcastOOB("swap", playersOOB)
 	BroadcastOOB("scoreboard", buf.String())
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
