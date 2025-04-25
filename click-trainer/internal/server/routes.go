@@ -11,10 +11,11 @@ var (
 )
 
 func Run() error {
-	tmpl = template.Must(template.ParseFiles("templates/game.html", "templates/join.html", "templates/target.html"))
+	tmpl = template.Must(template.ParseFiles("templates/game.html", "templates/join.html", "templates/target.html", "templates/lobby.html"))
 
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/register", handleRegister)
+	http.HandleFunc("/ready", handleReady)
 	http.HandleFunc("/target/", handleTarget)
 	http.HandleFunc("/events", handleEvents)
 	http.HandleFunc("/poll", handlePoll)

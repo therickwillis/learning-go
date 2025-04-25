@@ -5,4 +5,5 @@ type Player struct {
 	Name  string
 	Color string
 	Score int
+	Ready bool
 }

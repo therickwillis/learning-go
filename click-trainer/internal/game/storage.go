@@ -5,14 +5,34 @@ import (
 	"clicktrainer/internal/targets"
 )
 
+type Scene string
+
 type GameData struct {
+	Scene   Scene
+	Player  *players.Player
 	Players []*players.Player
 	Targets []*targets.Target
 }
 
-func Get() GameData {
+const (
+	SceneLobby  = Scene("lobby")
+	SceneCombat = Scene("combat")
+	SceneRecap  = Scene("recap")
+)
+
+var (
+	scene = SceneLobby
+)
+
+func Get(id string) GameData {
 	return GameData{
+		Scene:   scene,
+		Player:  players.Get(id),
 		Players: players.GetList(),
 		Targets: targets.GetList(),
 	}
+}
+
+func SetScene(s Scene) {
+	scene = s
 }

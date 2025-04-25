@@ -35,12 +35,13 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 			players.Add(idCookie.Value, nameCookie.Value)
 		}
 
-		gameData := gamedata.Get()
+		gameData := gamedata.Get(idCookie.Value)
 
 		if err := tmpl.ExecuteTemplate(w, "game", gameData); err != nil {
 			fmt.Println(err.Error())
 			http.Error(w, "Error rendering game view", http.StatusInternalServerError)
 		}
+		return
 	}
 
 	if err := tmpl.ExecuteTemplate(w, "join", nil); err != nil {
@@ -49,9 +50,53 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReady(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[Handle:Ready] Request Received")
+	idCookie, err := r.Cookie("player_id")
+	if err != nil {
+		http.Error(w, "Not Registered", http.StatusBadRequest)
+		return
+	}
+
+	readyTxt := "waiting for player"
+	buttonTxt := "I'm Ready!"
+	inputTxt := "ready"
+	isReady := r.FormValue("ready") == "ready"
+	player := players.SetReady(idCookie.Value, isReady)
+	if isReady {
+		readyTxt = "Let's Go!"
+		buttonTxt = "Wait! I'm not ready!"
+		inputTxt = "wait"
+		if players.AllReady() {
+			fmt.Println(" -- all ready -- ")
+			gamedata.SetScene(gamedata.SceneCombat)
+
+			data := gamedata.Get(idCookie.Value)
+			var buf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&buf, "gameContent", data); err != nil {
+				fmt.Println(err.Error())
+				http.Error(w, "Error executing game template", http.StatusInternalServerError)
+			}
+			gameOOB := fmt.Sprintf(`<div id="game-content" hx-swap-oob="outerHTML">%s</div>`, buf.String())
+			BroadcastOOB("swap", gameOOB)
+			return
+		}
+	}
+
+	playerOOB := fmt.Sprintf(`<div id="lobby_player_ready%s" hx-swap-oob="innerHTML">%s</div>`, player.ID, readyTxt)
+	buttonOOB := fmt.Sprintf(`<button id="ready_button" hx-swap-oob="innerHTML">%s</button>`, buttonTxt)
+	inputOOB := fmt.Sprintf(`<input id="ready_input" type="hidden" name="ready" hx-swap-oob="outerHTML" value="%s"/>`, inputTxt)
+	BroadcastOOB("swap", playerOOB+buttonOOB+inputOOB)
+}
+
 func handlePoll(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Poll] Request Received")
-	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get()); err != nil {
+	idCookie, err := r.Cookie("player_id")
+	if err != nil {
+		http.Error(w, "Not Registered", http.StatusBadRequest)
+		return
+	}
+	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get(idCookie.Value)); err != nil {
 		log.Println(err)
 	}
 }

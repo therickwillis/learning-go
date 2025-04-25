@@ -7,6 +7,7 @@ import (
 
 var (
 	players   = make(map[string]*Player)
+	allReady  = false
 	playersMu sync.Mutex
 )
 
@@ -15,6 +16,12 @@ func Add(id string, name string) error {
 	players[id] = &Player{ID: id, Name: name, Color: utility.RandomColorHex()}
 	playersMu.Unlock()
 	return nil
+}
+
+func Get(id string) *Player {
+	playersMu.Lock()
+	defer playersMu.Unlock()
+	return players[id]
 }
 
 func GetList() []*Player {
@@ -35,6 +42,29 @@ func UpdateScore(id string, points int) *Player {
 		return p
 	}
 	return nil
+}
+
+func SetReady(id string, isReady bool) *Player {
+	playersMu.Lock()
+	defer playersMu.Unlock()
+	if p, e := players[id]; e {
+		p.Ready = isReady
+		return p
+	}
+	return nil
+}
+
+func AllReady() bool {
+	playersMu.Lock()
+	defer playersMu.Unlock()
+	all := true
+	for _, player := range players {
+		if all {
+			all = player.Ready
+		}
+		break
+	}
+	return all
 }
 
 func ValidateSession(sessionId string) bool {

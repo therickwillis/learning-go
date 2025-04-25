@@ -13,52 +13,47 @@
 </head>
 
 <body hx-ext="sse" sse-connect="/events" class="bg-gray-700">
-    <div id="game-content">
-        {{template "gameContent" .}}
+    <div>
+        <div class="p-4 h-screen relative">
+            <div id="game-content"
+                class="h-full flex flex-col justify-center items-center md:scale-130 lg:scale-160 xl:scale-180 2xl:scale-200 3xl:scale-230 4xl:scale-260">
+                {{if eq .Scene "lobby"}}
+                {{template "lobby" .}}
+                {{else}}
+                {{template "gameContent" .}}
+                {{end}}
+            </div>
+        </div>
     </div>
     <div sse-swap="swap" hx-swap="true"></div>
-    <div id="game-content-conn"                
-        hx-trigger="sse:update"
-        hx-get="/poll"
-        hx-target="#game-content"
-        hx-swap="innerHTML"
-    ></div>
+    <div id="game-content-conn" hx-trigger="sse:update" hx-get="/poll" hx-target="#game-content" hx-swap="innerHTML">
+    </div>
 </body>
 
 </html>
 {{end}}
 
 {{define "gameContent"}}
-<div class="p-4 h-screen relative">
-    <div class="h-full flex flex-col justify-center items-center md:scale-130 lg:scale-160 xl:scale-180 2xl:scale-200 3xl:scale-230 4xl:scale-260">
-        <div class="flex flex-row">
-            {{template "scoreboard" .Players}}
-        </div>    
-        <div id="game-area" class="relative" >
-            <div id="targets">
-            {{range .Targets}}
-                {{template "target" .}}
-            {{end}}
-            <div sse-swap="newTarget" hx-swap="beforebegin"></div>            
-            </div>
-        </div>
-        
-    </div>    
+<div class="flex flex-row">
+    {{template "scoreboard" .Players}}
+</div>
+<div id="game-area" class="relative">
+    <div id="targets">
+        {{range .Targets}}
+        {{template "target" .}}
+        {{end}}
+        <div sse-swap="newTarget" hx-swap="beforebegin"></div>
+    </div>
 </div>
 {{end}}
 
 {{define "scoreboard"}}
-<div id="scoreboard" sse-swap="scoreboard" hx-swap="outerHTML" class="flex flex-row flex-wrap gap-1 p-1 text-xs">        
+<div id="scoreboard" sse-swap="scoreboard" hx-swap="outerHTML" class="flex flex-row flex-wrap gap-1 p-1 text-xs">
     {{range .}}
     <div id="player_{{.ID}}" class="bg-white flex flex-row p-1 rounded-lg">
         <label style="color:{{.Color}}" class="mr-2">{{ .Name }}</label>
         <div id="player_score_{{ .ID }}">{{ .Score}}</div>
     </div>
-    {{end}}    
+    {{end}}
 </div>
 {{end}}
-
-
-
-
-  
