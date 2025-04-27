@@ -21,7 +21,10 @@ func init() {
 	baseTmpl := template.Must(template.ParseFiles("templates/base.html"))
 	for _, child := range []string{"register", "join", "lobby", "game", "recap"} {
 		t, _ := baseTmpl.Clone()
-		t.ParseFiles(fmt.Sprintf("templates/%s.html", child))
+		_, err := t.ParseFiles(fmt.Sprintf("templates/%s.html", child))
+		if err != nil {
+			fmt.Println("Error parsing templates")
+		}
 		pages[child] = t
 	}
 }
@@ -49,18 +52,28 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGame(w http.ResponseWriter, r *http.Request) {
+	if err := validateCookies(w, r); err != nil {
+		fmt.Println("[Handle:Game] failed cookie validation")
+	}
+
+	// establish the session
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[2]
+	if len(id) > 0 {
+		fmt.Printf("Game Session Found:%s\n", id)
+	} else {
+		// newId := M
+		// sessions.NewSession(newId)
+		// http.Redirect(w, r, fmt.Sprintf("/g/%s", newId), http.StatusSeeOther)
+		return
+	}
+
+	// pass the game data to the game template
 	if err := tmpl.ExecuteTemplate(w, "game", nil); err != nil {
 		fmt.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
-
-// func handlePoll(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("[Handle:Poll] Request Received")
-// 	if err := tmpl.ExecuteTemplate(w, "gameContent", gamedata.Get()); err != nil {
-// 		log.Println(err)
-// 	}
-// }
 
 func handleTarget(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Target] Request Received")
@@ -140,4 +153,14 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	BroadcastOOB("scoreboard", buf.String())
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func validateCookies(w http.ResponseWriter, r *http.Request) error {
+	idCookie, _ := r.Cookie("player_id")
+	if err := idCookie.Valid(); err != nil {
+		fmt.Println("[ValidateCookie] No player cookie found")
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+		return err
+	}
+	return nil
 }

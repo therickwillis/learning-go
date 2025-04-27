@@ -8,6 +8,44 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
+type Player struct {
+	ID    string
+	Name  string
+	Color string
+	Score int
+}
+
+type Target struct {
+	ID    string
+	X     int
+	Y     int
+	Size  int
+	Color string
+	Dead  bool
+}
+
+type Phase int
+
+const (
+	Lobby Phase = iota
+	Game
+	End
+)
+
+type Session struct {
+	ID      string
+	Players map[string]*Player
+	Targets map[string]*Target
+	phase   Phase
+	events  chan SessionEvent
+	mu      sync.RWMutex
+}
+
+type SessionEvent struct {
+	Event string
+	Data  string
+}
+
 var (
 	gameHeight    = 400
 	gameWidth     = 600

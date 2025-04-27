@@ -11,7 +11,7 @@ var (
 )
 
 func Run() error {
-	tmpl = template.Must(template.ParseFiles("templates/game.html", "templates/join.html", "templates/target.html"))
+	//tmpl = template.Must(template.ParseFiles("templates/game.html", "templates/join.html", "templates/target.html"))
 
 	// new player flow (no cookie):
 	//  "/" -  Set Name, Click Start -> Server generates a new game session
