@@ -32,7 +32,13 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if !players.ValidateSession(idCookie.Value) {
-			players.Add(idCookie.Value, nameCookie.Value)
+			player := players.Add(idCookie.Value, nameCookie.Value)
+			var buf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&buf, "lobbyPlayer", player); err != nil {
+				log.Println(err)
+			}
+			fmt.Println("[Handle:Index] New Player OOB Broadcast")
+			BroadcastOOB("newPlayer", buf.String())
 		}
 
 		gameData := gamedata.Get(idCookie.Value)
@@ -63,6 +69,8 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 	inputTxt := "ready"
 	isReady := r.FormValue("ready") == "ready"
 	player := players.SetReady(idCookie.Value, isReady)
+	//data := gamedata.Get(idCookie.Value)
+
 	if isReady {
 		readyTxt = "Let's Go!"
 		buttonTxt = "Wait! I'm not ready!"
@@ -84,9 +92,13 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 	}
 
 	playerOOB := fmt.Sprintf(`<div id="lobby_player_ready%s" hx-swap-oob="innerHTML">%s</div>`, player.ID, readyTxt)
+	BroadcastOOB("swap", playerOOB)
+
 	buttonOOB := fmt.Sprintf(`<button id="ready_button" hx-swap-oob="innerHTML">%s</button>`, buttonTxt)
 	inputOOB := fmt.Sprintf(`<input id="ready_input" type="hidden" name="ready" hx-swap-oob="outerHTML" value="%s"/>`, inputTxt)
-	BroadcastOOB("swap", playerOOB+buttonOOB+inputOOB)
+	if _, err := w.Write([]byte(buttonOOB + inputOOB)); err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func handlePoll(w http.ResponseWriter, r *http.Request) {
@@ -166,15 +178,25 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	if err := players.Add(id, name); err != nil {
-		fmt.Println(err.Error())
-	}
+	players.Add(id, name)
 
-	var buf bytes.Buffer
-	if err := tmpl.ExecuteTemplate(&buf, "scoreboard", players.GetList()); err != nil {
-		log.Println(err)
+	data := gamedata.Get(id)
+
+	switch data.Scene {
+	case gamedata.SceneLobby:
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "lobbyPlayer", data.Player); err != nil {
+			log.Println(err)
+		}
+
+		BroadcastOOB("newPlayer", buf.String())
+	default:
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "scoreboard", players.GetList()); err != nil {
+			log.Println(err)
+		}
+		BroadcastOOB("scoreboard", buf.String())
 	}
-	BroadcastOOB("scoreboard", buf.String())
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

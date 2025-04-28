@@ -3,20 +3,24 @@
 <div class="w-md">
     <h1>this is the lobby</h1>
     <h2>Players</h2>
-    <div class="w-md">
+    <div id="lobby_players" class="w-md">
         {{range .Players}}
-        <div class="flex flex-row bg-white rounded-lg w-full">
-            <div class="grow">{{.Name}}</div>
-            <div id="lobby_player_ready{{.ID}}" class="grow">{{if eq .Ready true}}Let's Go!{{else}}waiting for player{{end}}</div>
-        </div>
+            {{template "lobbyPlayer" .}}
         {{end}}
+        <div sse-swap="newPlayer" hx-swap="beforeend"></div>
     </div>
-    <div>
+    <div class="mb-20">
         <input id="ready_input" type="hidden" name="ready" value="{{if eq .Player.Ready true}}wait{{else}}ready{{end}}"/>
         <button id="ready_button" type="submit" hx-post="/ready" hx-include="[name='ready']" hx-swap="none" class="bg-blue-700 hover:bg-blue-600 p-4 border-1 cursor-pointer rounded-lg text-white focus:ring-blue-400">
             {{if eq .Player.Ready true}}Wait! Hold on a sec!{{else}}I'm Ready!{{end}}
         </button>
     </div>
-    <div style="height:5rem"></div>
+</div>
+{{end}}
+
+{{define "lobbyPlayer"}}
+<div id="lobby_player{{.ID}}" class="flex flex-row bg-white rounded-lg w-full">
+    <div class="grow">{{.Name}}</div>
+    <div id="lobby_player_ready{{.ID}}" class="grow">{{if eq .Ready true}}Let's Go!{{else}}waiting for player{{end}}</div>
 </div>
 {{end}}

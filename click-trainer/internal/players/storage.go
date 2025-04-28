@@ -11,11 +11,12 @@ var (
 	playersMu sync.Mutex
 )
 
-func Add(id string, name string) error {
+func Add(id string, name string) *Player {
 	playersMu.Lock()
-	players[id] = &Player{ID: id, Name: name, Color: utility.RandomColorHex()}
-	playersMu.Unlock()
-	return nil
+	defer playersMu.Unlock()
+	player := &Player{ID: id, Name: name, Color: utility.RandomColorHex()}
+	players[id] = player
+	return player
 }
 
 func Get(id string) *Player {
@@ -57,14 +58,16 @@ func SetReady(id string, isReady bool) *Player {
 func AllReady() bool {
 	playersMu.Lock()
 	defer playersMu.Unlock()
-	all := true
-	for _, player := range players {
-		if all {
-			all = player.Ready
-		}
-		break
+	if len(players) == 0 {
+		return false
 	}
-	return all
+
+	for _, player := range players {
+		if !player.Ready {
+			return false
+		}
+	}
+	return true
 }
 
 func ValidateSession(sessionId string) bool {
