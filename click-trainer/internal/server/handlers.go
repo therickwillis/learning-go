@@ -69,14 +69,12 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 	inputTxt := "ready"
 	isReady := r.FormValue("ready") == "ready"
 	player := players.SetReady(idCookie.Value, isReady)
-	//data := gamedata.Get(idCookie.Value)
 
 	if isReady {
 		readyTxt = "Let's Go!"
 		buttonTxt = "Wait! I'm not ready!"
 		inputTxt = "wait"
 		if players.AllReady() {
-			fmt.Println(" -- all ready -- ")
 			gamedata.SetScene(gamedata.SceneCombat)
 
 			data := gamedata.Get(idCookie.Value)
@@ -85,8 +83,25 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err.Error())
 				http.Error(w, "Error executing game template", http.StatusInternalServerError)
 			}
-			gameOOB := fmt.Sprintf(`<div id="game-content" hx-swap-oob="outerHTML">%s</div>`, buf.String())
-			BroadcastOOB("swap", gameOOB)
+
+			countdownStart := 5
+			var countdownBuf bytes.Buffer
+			if err := tmpl.ExecuteTemplate(&countdownBuf, "lobbyCountdown", countdownStart); err != nil {
+				fmt.Println(err.Error())
+				http.Error(w, "Error executing lobbyCountdown template", http.StatusInternalServerError)
+			}
+			countdownOOB := fmt.Sprintf(`<div id="lobby" hx-swap-oob="afterend">%s</div>`, countdownBuf.String())
+			BroadcastOOB("swap", countdownOOB)
+
+			go func() {
+				for i := range countdownStart {
+					BroadcastOOB("swap", fmt.Sprintf(`<span id="countdown_num" hx-swap-oob="true">%d</span>`, countdownStart-i))
+					time.Sleep(1 * time.Second)
+				}
+				gameOOB := fmt.Sprintf(`<div id="game-content" hx-swap-oob="outerHTML">%s</div>`, buf.String())
+				BroadcastOOB("swap", gameOOB)
+			}()
+
 			return
 		}
 	}

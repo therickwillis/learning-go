@@ -1,8 +1,7 @@
 
 {{define "lobby"}}
-<div class="w-md">
-    <h1>this is the lobby</h1>
-    <h2>Players</h2>
+<div id="lobby" class="w-md">
+    <h1>Lobby</h1>    
     <div id="lobby_players" class="w-md">
         {{range .Players}}
             {{template "lobbyPlayer" .}}
@@ -22,5 +21,11 @@
 <div id="lobby_player{{.ID}}" class="flex flex-row bg-white rounded-lg w-full">
     <div class="grow">{{.Name}}</div>
     <div id="lobby_player_ready{{.ID}}" class="grow">{{if eq .Ready true}}Let's Go!{{else}}waiting for player{{end}}</div>
+</div>
+{{end}}
+
+{{define "lobbyCountdown"}}
+<div>
+    <h1>Countdown <span id="countdown_num">{{.}}</span></h1>
 </div>
 {{end}}
