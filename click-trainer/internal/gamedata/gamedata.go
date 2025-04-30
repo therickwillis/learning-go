@@ -1,6 +1,7 @@
 package gamedata
 
 import (
+	"clicktrainer/internal/events"
 	"clicktrainer/internal/players"
 	"clicktrainer/internal/targets"
 )
@@ -35,4 +36,5 @@ func Get(id string) GameData {
 
 func SetScene(s Scene) {
 	scene = s
+	events.SceneChanges <- events.SceneChangeEvent{Scene: string(s)}
 }

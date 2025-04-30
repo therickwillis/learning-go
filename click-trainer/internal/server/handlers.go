@@ -2,7 +2,7 @@ package server
 
 import (
 	"bytes"
-	gamedata "clicktrainer/internal/game"
+	gamedata "clicktrainer/internal/gamedata"
 	"clicktrainer/internal/players"
 	"clicktrainer/internal/targets"
 	"fmt"
@@ -84,7 +84,7 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Error executing game template", http.StatusInternalServerError)
 			}
 
-			countdownStart := 5
+			countdownStart := 2
 			var countdownBuf bytes.Buffer
 			if err := tmpl.ExecuteTemplate(&countdownBuf, "lobbyCountdown", countdownStart); err != nil {
 				fmt.Println(err.Error())
@@ -98,7 +98,7 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 					BroadcastOOB("swap", fmt.Sprintf(`<span id="countdown_num" hx-swap-oob="true">%d</span>`, countdownStart-i))
 					time.Sleep(1 * time.Second)
 				}
-				gameOOB := fmt.Sprintf(`<div id="game-content" hx-swap-oob="outerHTML">%s</div>`, buf.String())
+				gameOOB := fmt.Sprintf(`<div id="scene" hx-swap-oob="innerHTML">%s</div>`, buf.String())
 				BroadcastOOB("swap", gameOOB)
 			}()
 

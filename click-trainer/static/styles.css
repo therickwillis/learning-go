@@ -1,49 +1,103 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-  }
-    
-  #game-area {
-    position:relative;
-    width: 600px;
-    height: 400px;
-    background-color: #e6edf4;
-    border: 2px solid #333;
-  }
-  
-  
-  /* Animation for when the target is added */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: url('/static/background.svg');
+  background-size: cover;
+}
+
+#game-area {
+  position: relative;
+  width: 600px;
+  height: 400px;
+}
+
+
+/* Animation for when the target is added */
 .target {
-    /* Run an enter animation on load */
-    animation: targetEnter 0.3s ease-out;
+  pointer-events: none;
+  /* Run an enter animation on load */
+  animation: targetEnter 0.3s ease-in;
+
+  circle {
+    pointer-events: visible;
   }
-  
-  @keyframes targetEnter {
-    from {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+}
+
+@keyframes targetEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
   }
-  
-  /* Class for triggering exit animation */
-  .fade-out {
-    animation: targetExit 0.3s ease-out forwards;
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  @keyframes targetExit {
-    from {
-      opacity: 1;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.5);
-    }
+}
+
+/* Class for triggering exit animation */
+.fade-out {
+  animation: targetExit 0.3s ease-in forwards;
+}
+
+@keyframes targetExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
   }
-  
+
+  to {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+
+/* defaults */
+:root {
+  --gradient-start: #434343;
+  --gradient-end: #000000;
+  --gradient-start-old: #434343;
+  --gradient-end-old: #000000;
+  --gradient-start-old: --gradient-opacity: 0.8;
+}
+
+body[data-scene="lobby"] {
+  --gradient-start: #754ce5;
+  --gradient-end: #3ac9e8;
+}
+
+body[data-scene="combat"] {
+  --gradient-start: #2a48b7;
+  --gradient-end: #3f99d2;
+}
+
+body[data-scene="join"] {
+  --gradient-start: #ffafbd;
+  --gradient-end: #ffc3a0;
+}
+
+body[data-scene="recap"] {
+  --gradient-start: #a18cd1;
+  --gradient-end: #fbc2eb;
+}
+
+
+
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+  opacity: var(--gradient-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+
+}
+
+#scene>*:not(.gradient-overlay) {
+  position: relative;
+  z-index: 10;
+}

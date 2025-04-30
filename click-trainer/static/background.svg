@@ -1,0 +1,50 @@
+<svg viewBox="0 0 800 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- sky gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7f5af0"/>
+      <stop offset="100%" stop-color="#6ad7f5"/>
+    </linearGradient>
+    <!-- cloud shape -->
+    <g id="cloud">
+      <ellipse cx="60" cy="40" rx="60" ry="30"/>
+      <ellipse cx="100" cy="50" rx="50" ry="25"/>
+      <ellipse cx="20" cy="50" rx="50" ry="25"/>
+    </g>
+  </defs>
+
+  <!-- sky -->
+  <rect width="800" height="600" fill="url(#skyGrad)"/>
+
+  <!-- little stars/dots -->
+  <g fill="#FFF" opacity="0.6">
+    <circle cx="120" cy="80" r="3"/>
+    <circle cx="300" cy="50" r="4"/>
+    <circle cx="500" cy="120" r="2.5"/>
+    <circle cx="700" cy="90" r="3.5"/>
+    <circle cx="650" cy="180" r="2"/>
+    <circle cx="180" cy="140" r="2.5"/>
+  </g>
+
+  <!-- clouds (re-use the cloud group) -->
+  <use href="#cloud" x="100" y="100" fill="#FFF" opacity="0.5"/>
+  <use href="#cloud" x="400" y="60"  fill="#FFF" opacity="0.4" transform="scale(0.8)"/>
+  <use href="#cloud" x="650" y="140" fill="#FFF" opacity="0.3" transform="scale(1.1)"/>
+
+  <!-- rolling hills -->
+  <path d="M0,450 
+           C200,400 400,500 800,450 
+           L800,600 L0,600 Z"
+        fill="#2a8540"/>
+  <path d="M0,470 
+           C180,430 380,520 800,480 
+           L800,600 L0,600 Z"
+        fill="#216a33"/>
+
+  <!-- optional foreground dots (e.g., distant foliage) -->
+  <g fill="#114422" opacity="0.8">
+    <circle cx="50"  cy="520" r="8"/>
+    <circle cx="750" cy="530" r="6"/>
+    <circle cx="400" cy="540" r="10"/>
+  </g>
+</svg>

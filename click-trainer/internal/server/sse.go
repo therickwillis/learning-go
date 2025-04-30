@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"clicktrainer/internal/events"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,6 +18,14 @@ var (
 	clients   = make(map[chan HxEventMessage]bool)
 	clientsMu sync.Mutex
 )
+
+func init() {
+	go func() {
+		for ev := range events.SceneChanges {
+			BroadcastOOB("sceneChange", ev.Scene)
+		}
+	}()
+}
 
 func handleEvents(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[Handle:Events] Request Received")
