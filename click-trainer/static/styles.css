@@ -6,6 +6,7 @@ body {
   overflow: hidden;
   background: url('/static/background.svg');
   background-size: cover;
+  font-family: 'Verdana', cursive;
 }
 
 #game-area {
@@ -14,6 +15,49 @@ body {
   height: 400px;
 }
 
+h1 {
+  font-size: 5rem;
+  font-weight: bolder;
+  text-shadow: 0 0.3rem 0 rgba(0,0,0,0.3);
+  -webkit-text-stroke: 0.1rem rgba(0,0,0,0.3);
+}
+
+h1.join {
+  color: whitesmoke;
+  text-align: center;
+}
+
+input[type="text"]{
+  padding:0.5rem;
+  border-radius: 0.5rem;
+  border:0.1rem solid whitesmoke;
+  box-shadow: 0 0 0.5rem whitesmoke;
+  margin: 3rem 0;
+  text-align: center;
+  font-size: 1.2rem;
+  color: white
+}
+
+button[type=submit] {
+  background-color:#4ac91c;
+  padding:0.5rem 2rem;
+  font-size: 2rem;
+  border-radius: 1.2rem;
+  outline: 0.2rem solid #165e53;
+  border: 0.3rem solid #82e027;
+  text-transform: uppercase;
+  color:white;
+  font-weight: 900;
+  text-shadow: 0 0.2rem #165e5333;  
+  cursor:pointer;
+  box-shadow: 0 0.7rem #165e5355;
+  transition: all 0.1s linear;
+}
+button[type=submit]:hover,
+button[type=submit]:focus{
+  background-color: #82e027;
+  outline-color: #52bb29
+}
 
 /* Animation for when the target is added */
 .target {
