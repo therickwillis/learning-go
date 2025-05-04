@@ -35,8 +35,13 @@ input[type="text"]{
   margin: 3rem 0;
   text-align: center;
   font-size: 1.2rem;
-  color: white
+  color: white;
+  max-width: 16rem;
 }
+input[type="text"]:focus {
+  outline-color: white;
+}
+
 
 button[type=submit] {
   background-color:#4ac91c;
@@ -52,6 +57,7 @@ button[type=submit] {
   cursor:pointer;
   box-shadow: 0 0.7rem #165e5355;
   transition: all 0.1s linear;
+  max-width: 16rem;
 }
 button[type=submit]:hover,
 button[type=submit]:focus{
@@ -105,8 +111,8 @@ button[type=submit]:focus{
   --gradient-start: #434343;
   --gradient-end: #000000;
   --gradient-start-old: #434343;
-  --gradient-end-old: #000000;
-  --gradient-start-old: --gradient-opacity: 0.8;
+  --gradient-end-old: #000000;  
+  --gradient-opacity: 0.8;
 }
 
 body[data-scene="lobby"] {
@@ -120,8 +126,8 @@ body[data-scene="combat"] {
 }
 
 body[data-scene="join"] {
-  --gradient-start: #ffafbd;
-  --gradient-end: #ffc3a0;
+  --gradient-start: #f7c2cb;
+  --gradient-end: #b173f8;
 }
 
 body[data-scene="recap"] {
@@ -129,19 +135,71 @@ body[data-scene="recap"] {
   --gradient-end: #fbc2eb;
 }
 
-
-
 .gradient-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
   opacity: var(--gradient-opacity);
-  mix-blend-mode: overlay;
+  mix-blend-mode: multiply;
   pointer-events: none;
-
+  z-index:1;
 }
 
 #scene>*:not(.gradient-overlay) {
   position: relative;
   z-index: 10;
+}
+
+
+form {
+  position:absolute;
+  inset:0;
+  z-index: 10;
+}
+
+/* Container for the parallax effect */
+.parallax-container {
+  position: fixed; /* Establishes positioning context for absolute children */      
+  inset:0;
+  overflow: hidden; /* Hides overflowing parts during animation */  
+  height: 100vh; /* Or a fixed height */
+  width: 100%;
+  z-index: 0;
+  /* For auto-moving, perspective and overflow-y: auto (used in scroll-based parallax [7, 9, 11]) are typically NOT on the container. */
+}
+
+/* Base styles for all parallax layers */
+.parallax-layer {
+  position: absolute; /* Position layers relative to the container */
+  top: 0;  
+  left: 0;
+  right:0;
+  bottom:0;  
+  white-space: nowrap;    
+  display:flex;
+  flex-direction: row;
+}
+
+/* Specific styles and animation for the first cloud layer (middle speed) */
+.cloud-1 {  
+  animation: scrollClouds linear infinite; /* Apply the animation */
+  animation-duration: 120s; /* Medium duration */  
+}
+
+/* Specific styles and animation for the second cloud layer (closest, fastest) */
+.cloud-2 {  
+  animation: scrollClouds linear infinite; /* Apply the animation */
+  animation-duration: 240s; /* Shorter duration for faster speed */  
+}
+
+.parallax-layer img {
+  height: 70vh;
+  width: 100%;
+  opacity: 0.7;
+}
+
+/* Keyframes for the second cloud animation */
+@keyframes scrollClouds {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }

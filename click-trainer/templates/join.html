@@ -9,20 +9,38 @@
     <link rel="icon" href="/static/favicon.ico">
 </head>
 
-<body class="bg-gray-200">
+<body data-scene="join" class="bg-gray-200">
     <form method="post" action="/register">
         <div id="join" class="flex flex-row h-screen">
             <div class="flex-1"></div>
             <div class="flex-1 content-center">
-                <div class="flex flex-col justify-center">
+                <div class="flex flex-col justify-center items-center">
                     <h1 class="join">JOIN</h1>                
-                    <input name="name" type="text" required placeholder="Your Name Here..." />
-                    <button type="submit" class="join">Start</button>
+                    <div>
+                        <input name="name" type="text" required placeholder="Your Name Here..." />
+                    </div>
+                    <div>
+                        <button type="submit" class="join">Start</button>
+                    </div>
                 </div>
             </div>
             <div class="flex-1"></div>
         </div>        
     </form>
+
+    <div class="gradient-overlay"></div>
+    <div class="parallax-container">
+        <div class="parallax-layer stars">
+        </div>        
+        <div class="parallax-layer cloud-1">            
+            <img src="/static/cloud-1.svg" />
+            <img src="/static/cloud-1.svg" />                                   
+        </div>
+        <div class="parallax-layer cloud-2">
+            <img src="/static/cloud-2.svg" />
+            <img src="/static/cloud-2.svg" />
+        </div>
+    </div>
 </body>
 
 </html>
